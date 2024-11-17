@@ -30,14 +30,23 @@ export async function GET(request: Request) {
       { $sort: { "messages.createdAt": -1 } },
       { $group: { _id: "$_id", messages: { $push: "messages" } } },
     ]);
-
-    if (!user || user.length === 0) {
+    //console.log(user);
+    if (!user) {
       return Response.json(
         {
           success: false,
           message: "User not found",
         },
         { status: 404 }
+      );
+    }
+    if (user.length === 0) {
+      return Response.json(
+        {
+          success: true,
+          message: "No messages exists",
+        },
+        { status: 200 }
       );
     }
     return Response.json(

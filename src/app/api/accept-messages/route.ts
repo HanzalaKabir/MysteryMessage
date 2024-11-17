@@ -8,7 +8,6 @@ export async function POST(request: Request) {
   await dbConnect();
 
   const session = await getServerSession(authOptions);
-  const user: User = session?.user as User;
 
   if (!session || !session.user) {
     return Response.json(
@@ -19,18 +18,20 @@ export async function POST(request: Request) {
       { status: 401 }
     );
   }
+  const user: User = session.user as User;
 
   const userId = user._id;
   const { acceptMessages } = await request.json();
 
   try {
-    const udpatedUser = UserModel.findByIdAndUpdate(
+    const udpatedUser = await UserModel.findByIdAndUpdate(
       userId,
       { isAcceptingMessages: acceptMessages },
       {
         new: true,
       }
     );
+    //console.log(acceptMessages, userId, udpatedUser);
 
     if (!udpatedUser) {
       return Response.json(

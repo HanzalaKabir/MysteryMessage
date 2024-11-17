@@ -23,7 +23,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
-  if (!token && url.pathname.startsWith("/hello")) {
+  if (!token && url.pathname.startsWith("/dashboard")) {
     const signInUrl = new URL("/sign-in", request.url);
     signInUrl.searchParams.set("callbackUrl", url.pathname);
     return NextResponse.redirect(signInUrl);
