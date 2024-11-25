@@ -1,5 +1,5 @@
 "use client";
-import { use,useState, useEffect } from "react";
+import { use, useState, useEffect } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -47,7 +47,6 @@ const page = ({ params }: PageProps) => {
     },
   });
 
-
   function onSubmit(data: z.infer<typeof FormSchema>) {
     toast({
       title: "You submitted the following values:",
@@ -59,26 +58,28 @@ const page = ({ params }: PageProps) => {
     });
   }
 
-  function handlePromptClick(event:React.MouseEvent<HTMLSpanElement>){
+  function handlePromptClick(event: React.MouseEvent<HTMLSpanElement>) {
     event.preventDefault();
     const text = event.currentTarget.textContent ?? "";
     form.reset({
       anonymousMessage: text,
     });
   }
-  const [geminiResponseArray,setGeminiResponseArray]=useState<string[]>([]);
+  const [geminiResponseArray, setGeminiResponseArray] = useState<string[]>([]);
 
-  const handleSuggestMessages=async()=>{
-    const geminiResponse=await axios.post<ApiResponse>(`/api/suggest-messages`);
-    const responseData=geminiResponse.data.message;
-     const responses=responseData.split("||");
-     setGeminiResponseArray(responses);
+  const handleSuggestMessages = async () => {
+    const geminiResponse = await axios.post<ApiResponse>(
+      `/api/suggest-messages`
+    );
+    const responseData = geminiResponse.data.message;
+    const responses = responseData.split("||");
+    setGeminiResponseArray(responses);
     console.log(geminiResponseArray);
-  }
+  };
 
-  useEffect(()=>{
+  useEffect(() => {
     handleSuggestMessages();
-  },[])
+  }, []);
 
   return (
     <div className="my-8">
@@ -119,15 +120,25 @@ const page = ({ params }: PageProps) => {
               </form>
             </Form>
             <div className="mt-20">
-              <Button className="block mb-4" onClick={handleSuggestMessages}>Suggest Messages</Button>
-              <span className="block mb-4">Click on any messages below to select it</span>
+              <Button className="block mb-4" onClick={handleSuggestMessages}>
+                Suggest Messages
+              </Button>
+              <span className="block mb-4">
+                Click on any messages below to select it
+              </span>
               <div className="border-solid border-gray border-2 rounded-md p-4">
-                <span className="font-medium text-xl mb-8">Messages</span>
-                {
-                  geminiResponseArray.map((response,index)=>{
-                   return <span className="block mb-2 border-solid border-gray text-center border-2 rounded-md p-2 hover:bg-gray-100" key={`${response}+${index}`} onClick={handlePromptClick}>{response}</span>
-                  })
-                }
+                <span className="font-medium text-xl mb-8">Suggestions</span>
+                {geminiResponseArray.map((response, index) => {
+                  return (
+                    <span
+                      className="block mb-2 border-solid border-gray text-center border-2 rounded-md p-2 hover:bg-gray-100"
+                      key={`${response}+${index}`}
+                      onClick={handlePromptClick}
+                    >
+                      {response}
+                    </span>
+                  );
+                })}
               </div>
             </div>
           </div>
