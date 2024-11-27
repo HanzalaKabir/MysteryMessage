@@ -15,7 +15,7 @@ import { Loader2, RefreshCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { User } from "next-auth";
 
-const page = () => {
+const Page = () => {
   const [messages, setMessages] = useState<Message[]>([]);
 
   const [isLoading, setIsLoading] = useState(false);
@@ -82,7 +82,7 @@ const page = () => {
         setIsSwitchLoading(false);
       }
     },
-    [setIsLoading, setMessages]
+    [setIsLoading, setMessages, toast]
   );
 
   useEffect(() => {
@@ -192,4 +192,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

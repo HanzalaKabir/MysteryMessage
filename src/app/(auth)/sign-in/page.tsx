@@ -21,7 +21,7 @@ import {
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 
-const page = () => {
+const Page = () => {
   const [isSubmitting, setisSubmitting] = useState(false);
 
   const { toast } = useToast();
@@ -140,4 +140,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;
