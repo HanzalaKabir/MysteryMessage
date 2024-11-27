@@ -14,6 +14,9 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials: any): Promise<any> {
+        if (!credentials) {
+          throw new Error("Credentials are missing");
+        }
         await dbConnect();
         try {
           const user = await UserModel.findOne({
@@ -37,8 +40,11 @@ export const authOptions: NextAuthOptions = {
           } else {
             throw new Error("Incorrect Password");
           }
-        } catch (error: any) {
-          throw new Error(error);
+        } catch (error: unknown) {
+          if (error instanceof Error) {
+            throw new Error(error.message);
+          }
+          throw new Error("An unexpected error occurred");
         }
       },
     }),

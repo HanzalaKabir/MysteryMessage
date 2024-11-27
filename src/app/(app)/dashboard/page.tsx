@@ -42,8 +42,8 @@ const Page = () => {
     try {
       const response = await axios.get<ApiResponse>("api/accept-messages");
       setValue("acceptMessages", response.data.isAcceptingMessages);
-    } catch (error) {
-      const axiosError = error as AxiosError<ApiResponse>;
+    } catch (_error) {
+      const axiosError = _error as AxiosError<ApiResponse>;
       toast({
         title: "Error",
         description:
@@ -54,7 +54,7 @@ const Page = () => {
     } finally {
       setIsSwitchLoading(false);
     }
-  }, [setValue]);
+  }, [setValue, toast]);
 
   const fetchMessages = useCallback(
     async (refresh: boolean = false) => {
@@ -69,8 +69,8 @@ const Page = () => {
             description: "Showing latest messages",
           });
         }
-      } catch (error) {
-        const axiosError = error as AxiosError<ApiResponse>;
+      } catch (_error) {
+        const axiosError = _error as AxiosError<ApiResponse>;
         toast({
           title: "Error",
           description:
@@ -102,8 +102,8 @@ const Page = () => {
         title: response.data.message,
         variant: "default",
       });
-    } catch (error) {
-      const axiosError = error as AxiosError<ApiResponse>;
+    } catch (_error) {
+      const axiosError = _error as AxiosError<ApiResponse>;
       toast({
         title: "Error",
         description:
@@ -177,7 +177,7 @@ const Page = () => {
       </Button>
       <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
         {messages.length > 0 ? (
-          messages.map((message, index) => (
+          messages.map((message) => (
             <MessageCard
               key={message._id as string}
               message={message}

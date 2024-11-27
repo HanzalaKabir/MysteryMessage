@@ -1,5 +1,5 @@
 "use client";
-import { use, useState, useEffect } from "react";
+import { use, useState, useEffect, useCallback } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -34,7 +34,7 @@ type PageProps = {
   }>;
 };
 
-const page = ({ params }: PageProps) => {
+const Page = ({ params }: PageProps) => {
   const resolvedParams = use(params);
   const username = resolvedParams.params?.[0];
 
@@ -67,7 +67,7 @@ const page = ({ params }: PageProps) => {
   }
   const [geminiResponseArray, setGeminiResponseArray] = useState<string[]>([]);
 
-  const handleSuggestMessages = async () => {
+  const handleSuggestMessages = useCallback(async () => {
     const geminiResponse = await axios.post<ApiResponse>(
       `/api/suggest-messages`
     );
@@ -75,7 +75,7 @@ const page = ({ params }: PageProps) => {
     const responses = responseData.split("||");
     setGeminiResponseArray(responses);
     console.log(geminiResponseArray);
-  };
+  }, [geminiResponseArray]);
 
   useEffect(() => {
     handleSuggestMessages();
@@ -149,4 +149,4 @@ const page = ({ params }: PageProps) => {
   );
 };
 
-export default page;
+export default Page;

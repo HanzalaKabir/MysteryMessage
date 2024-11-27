@@ -45,7 +45,7 @@ const VerifyAccount = () => {
     } catch (error) {
       console.error("Error verifying code", error);
       const axiosError = error as AxiosError<ApiResponse>;
-      let errorMessage = axiosError.response?.data.message;
+      const errorMessage = axiosError.response?.data.message;
       toast({
         title: "Verification failed",
         description: errorMessage,

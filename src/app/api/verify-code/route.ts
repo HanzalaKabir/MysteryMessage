@@ -1,7 +1,5 @@
-import { z } from "zod";
 import dbConnect from "@/lib/dbConnect";
 import UserModel from "@/model/User";
-import { usernameValidation } from "@/schemas/signUpSchema";
 
 export async function POST(request: Request) {
   await dbConnect();
@@ -54,8 +52,8 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
-  } catch (error) {
-    console.error("Error verifying user", error);
+  } catch (_error) {
+    console.error("Error verifying user", _error);
     return Response.json(
       {
         success: false,

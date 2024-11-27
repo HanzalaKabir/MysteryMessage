@@ -55,8 +55,8 @@ const Page = () => {
             `/api/check-username-unique?username=${username}`
           );
           setUsernameMessage(reponse.data.message);
-        } catch (error) {
-          const axiosError = error as AxiosError<ApiResponse>;
+        } catch (_error) {
+          const axiosError = _error as AxiosError<ApiResponse>;
           setUsernameMessage(
             axiosError.response?.data.message ?? "Error checking username"
           );
@@ -78,10 +78,10 @@ const Page = () => {
       });
       console.log(response);
       router.replace(`/verify/${username}`);
-    } catch (error) {
-      console.error("Error in signup of user", error);
-      const axiosError = error as AxiosError<ApiResponse>;
-      let errorMessage = axiosError.response?.data.message;
+    } catch (_error) {
+      console.error("Error in signup of user", _error);
+      const axiosError = _error as AxiosError<ApiResponse>;
+      const errorMessage = axiosError.response?.data.message;
       toast({
         title: "Signup failed",
         description: errorMessage,
