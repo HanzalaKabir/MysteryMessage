@@ -1,28 +1,11 @@
 "use client";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "../ui/button";
-import { X } from "lucide-react";
 import { Message } from "@/model/User";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 import { ApiResponse } from "@/types/ApiResponse";
+import { Label } from "../ui/label";
 
 type MessageCardProps = {
   message: Message;
@@ -31,6 +14,7 @@ type MessageCardProps = {
 
 const MessageCard = ({ message, onMessageDelete }: MessageCardProps) => {
   const { toast } = useToast();
+  //console.log(message);
   const handleDeleteConfirm = async () => {
     const response = await axios.delete<ApiResponse>(
       `/api/delete-message/${message._id}`
@@ -40,35 +24,16 @@ const MessageCard = ({ message, onMessageDelete }: MessageCardProps) => {
     });
     onMessageDelete(message._id as string);
   };
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Card Title</CardTitle>
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button variant="destructive">
-              <X className="w-5 h-5" />
-            </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete your
-                account and remove your data from our servers.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={handleDeleteConfirm}>
-                Continue
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-        <CardDescription>Card Description</CardDescription>
-      </CardHeader>
-      <CardContent></CardContent>
+    <Card className="w-[300px] mx-4 mt-4">
+      <CardContent className="p-2 pl-4">
+        <Label className="">Message</Label>
+        <span className="block">{message.message}</span>
+      </CardContent>
+      <CardFooter className="flex justify-between">
+        <Button onClick={handleDeleteConfirm}>Delete</Button>
+      </CardFooter>
     </Card>
   );
 };

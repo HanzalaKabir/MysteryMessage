@@ -40,7 +40,7 @@ const Page = () => {
   const onSubmit = async (data: z.infer<typeof signInSchema>) => {
     try {
       setisSubmitting(true);
-
+      data.identifier = data.identifier.toLowerCase();
       const result = await signIn("credentials", {
         redirect: false,
         identifier: data.identifier,

@@ -18,7 +18,7 @@ export async function GET(request: Request) {
 
     //validate with zod
     const result = UsernameQuerySchema.safeParse(queryParam);
-    console.log(result);
+    //console.log(result);
     if (!result.success) {
       const usernameErrors = result.error.format().username?._errors || [];
       return Response.json(
@@ -31,9 +31,10 @@ export async function GET(request: Request) {
     }
 
     const { username } = result.data;
+    const usernameInLowerCase = username.toLowerCase();
 
     const existingVerifiedUser = await UserModel.findOne({
-      username,
+      username: usernameInLowerCase,
       isVerified: true,
     });
     if (existingVerifiedUser) {

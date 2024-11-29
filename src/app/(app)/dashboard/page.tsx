@@ -58,11 +58,19 @@ const Page = () => {
 
   const fetchMessages = useCallback(
     async (refresh: boolean = false) => {
+      //console.log("I am here");
       setIsLoading(true);
       setIsSwitchLoading(false);
       try {
-        const response = await axios.get<ApiResponse>("/api/get-messages");
-        setMessages(response.data.messages || []);
+        const response = await axios.get("/api/get-messages");
+        const messages = response.data.messages[0].messages.map(
+          (message: any) => {
+            //console.log(message);
+            return message;
+          }
+        );
+        //console.log(messages);
+        setMessages(messages || []);
         if (refresh) {
           toast({
             title: "Refreshed Messages",
@@ -77,6 +85,7 @@ const Page = () => {
             axiosError.response?.data.message || "Failed to fetch messages",
           variant: "destructive",
         });
+        console.log(_error);
       } finally {
         setIsLoading(false);
         setIsSwitchLoading(false);
@@ -175,7 +184,7 @@ const Page = () => {
           <RefreshCcw className="h-4 w-4" />
         )}
       </Button>
-      <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="mt-4 flex flex-wrap">
         {messages.length > 0 ? (
           messages.map((message) => (
             <MessageCard

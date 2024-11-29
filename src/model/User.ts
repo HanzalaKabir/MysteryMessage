@@ -1,7 +1,9 @@
 import mongoose, { Schema, Document } from "mongoose";
+import { ReactNode } from "react";
 
 export interface Message extends Document {
-  content: string;
+  message?: ReactNode;
+  content?: string;
   createdAt: Date;
 }
 

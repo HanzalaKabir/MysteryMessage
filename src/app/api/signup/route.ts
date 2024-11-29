@@ -25,6 +25,8 @@ export async function POST(request: Request) {
       );
     }
 
+    const usernameInLowerCase = username.toLowerCase();
+
     const existingUserByEmail = await UserModel.findOne({ email });
     const verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
 
@@ -47,7 +49,7 @@ export async function POST(request: Request) {
       expiryDate.setHours(expiryDate.getHours() + 1);
 
       const newUser = new UserModel({
-        username,
+        username: usernameInLowerCase,
         email,
         password: hashedPassword,
         verifyCode,

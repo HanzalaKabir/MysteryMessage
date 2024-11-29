@@ -6,9 +6,10 @@ export async function POST(request: Request) {
   await dbConnect();
 
   const { username, content } = await request.json();
+  const usernameInLowerCase = username.toLowerCase();
 
   try {
-    const user = await UserModel.findOne({ username });
+    const user = await UserModel.findOne({ username: usernameInLowerCase });
 
     if (!user) {
       return Response.json(
@@ -36,7 +37,7 @@ export async function POST(request: Request) {
 
     return Response.json(
       {
-        success: false,
+        success: true,
         message: "Message sent successfully",
       },
       { status: 200 }

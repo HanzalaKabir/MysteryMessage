@@ -1,5 +1,6 @@
 "use client";
-import { use, useState, useEffect, useCallback } from "react";
+
+import { useState, useEffect, useCallback, use } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -16,29 +17,33 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import axios from "axios";
 import { ApiResponse } from "@/types/ApiResponse";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Terminal } from "lucide-react";
 
 const FormSchema = z.object({
   anonymousMessage: z
     .string()
     .min(10, {
-      message: "Bio must be at least 10 characters.",
+      message: "Message must be at least 10 characters.",
     })
     .max(160, {
-      message: "Bio must not be longer than 30 characters.",
+      message: "Message must not be longer than 160 characters.",
     }),
 });
 
 type PageProps = {
   params: Promise<{
-    params: string[];
+    username: string;
   }>;
 };
 
 const Page = ({ params }: PageProps) => {
   const resolvedParams = use(params);
-  const username = resolvedParams.params?.[0];
-
+  const { username } = resolvedParams;
+  //console.log(username);
   const { toast } = useToast();
+  const [isUserAcceptingMessages, setIsUserAcceptingMessages] = useState(false);
+  const [userFound, setUserFound] = useState(true);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -47,15 +52,73 @@ const Page = ({ params }: PageProps) => {
     },
   });
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    });
+  // Fetch user status on component mount
+  useEffect(() => {
+    const checkUserStatus = async () => {
+      try {
+        const isUser = await axios.get<ApiResponse>(
+          `/api/is-user?username=${username}`
+        );
+
+        if (isUser.data.success) {
+          setIsUserAcceptingMessages(
+            isUser.data.isAcceptingMessages as boolean
+          );
+        } else {
+          setUserFound(false);
+        }
+      } catch (error) {
+        setUserFound(false);
+      }
+    };
+
+    checkUserStatus();
+  }, [username]);
+
+  async function onSubmit(data: z.infer<typeof FormSchema>) {
+    try {
+      // Check user status before submitting
+      const userStatusCheck = await axios.get<ApiResponse>(
+        `/api/is-user?username=${username}`
+      );
+
+      if (!userStatusCheck.data.isAcceptingMessages) {
+        toast({
+          title: "Cannot send message",
+          description: "This user is not accepting messages",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const content = data.anonymousMessage;
+      const response = await axios.post<ApiResponse>(`/api/send-message`, {
+        content,
+        username,
+      });
+
+      if (response.data.success) {
+        toast({
+          title: "Message Sent",
+          description: response.data.message,
+        });
+        // Optionally reset the form
+        form.reset();
+      } else {
+        toast({
+          title: "Failed to save message",
+          description: response.data.message,
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error submitting message:", error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      });
+    }
   }
 
   function handlePromptClick(event: React.MouseEvent<HTMLSpanElement>) {
@@ -64,22 +127,48 @@ const Page = ({ params }: PageProps) => {
     form.reset({
       anonymousMessage: text,
     });
+    return;
   }
+
   const [geminiResponseArray, setGeminiResponseArray] = useState<string[]>([]);
 
   const handleSuggestMessages = useCallback(async () => {
-    const geminiResponse = await axios.post<ApiResponse>(
-      `/api/suggest-messages`
-    );
-    const responseData = geminiResponse.data.message;
-    const responses = responseData.split("||");
-    setGeminiResponseArray(responses);
-    console.log(geminiResponseArray);
-  }, [geminiResponseArray]);
+    try {
+      const geminiResponse = await axios.post<ApiResponse>(
+        `/api/suggest-messages`
+      );
+      const responseData = geminiResponse.data.message;
+      const responses = responseData.split("||");
+      setGeminiResponseArray(responses);
+      return;
+    } catch (error) {
+      console.error("Failed to fetch suggested messages:", error);
+    }
+  }, []);
 
   useEffect(() => {
     handleSuggestMessages();
-  }, []);
+  }, [handleSuggestMessages]);
+
+  if (!userFound) {
+    return (
+      <Alert>
+        <Terminal className="h-4 w-4" />
+        <AlertTitle>Heads up!</AlertTitle>
+        <AlertDescription>User not found</AlertDescription>
+      </Alert>
+    );
+  }
+
+  if (!isUserAcceptingMessages) {
+    return (
+      <Alert>
+        <Terminal className="h-4 w-4" />
+        <AlertTitle>Heads up!</AlertTitle>
+        <AlertDescription>User is not accepting messages</AlertDescription>
+      </Alert>
+    );
+  }
 
   return (
     <div className="my-8">
